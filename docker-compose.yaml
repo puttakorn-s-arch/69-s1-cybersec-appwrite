@@ -1,0 +1,28 @@
+version: '3'
+services:
+  app:
+    image: appwrite/appwrite:1.5.0
+    container_name: 69-s1-appwrite
+    restart: always
+    ports:
+      - "9092:80"      # Change from 9091 -> 9092
+      - "443:443"
+    volumes:
+      - appwrite-uploads:/storage/uploads
+      - appwrite-builds:/storage/builds
+      - appwrite-cache:/storage/cache
+      - appwrite-config:/storage/config
+      - appwrite-certificates:/storage/certificates
+    environment:
+      - _APP_ENV=development
+      - _APP_SYSTEM_SECRET=your-super-secret-key-change-this
+      - _APP_DOMAIN=localhost
+      - _APP_DOMAIN_TARGET=localhost
+      - _APP_HOME=http://localhost:9092    # Change from 9091 -> 9092
+
+volumes:
+  appwrite-uploads:
+  appwrite-builds:
+  appwrite-cache:
+  appwrite-config:
+  appwrite-certificates:
