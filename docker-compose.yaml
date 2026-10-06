@@ -1,24 +1,159 @@
-version: '3'
+x-appwrite-defaults: &appwrite-defaults
+  image: appwrite/appwrite:1.5.0
+  restart: always
+  volumes:
+    - appwrite-uploads:/storage/uploads
+    - appwrite-builds:/storage/builds
+    - appwrite-cache:/storage/cache
+    - appwrite-config:/storage/config
+    - appwrite-certificates:/storage/certificates
+  environment:
+    - _APP_ENV=development
+    - _APP_SYSTEM_SECRET=${APPWRITE_SYSTEM_SECRET:?set APPWRITE_SYSTEM_SECRET in .env}
+    - _APP_OPENSSL_KEY_V1=${APPWRITE_OPENSSL_KEY_V1:-your-super-secret-key-change-this}
+    - _APP_DOMAIN=localhost
+    - _APP_DOMAIN_TARGET=localhost
+    - _APP_HOME=http://localhost:9092
+    - _APP_CONSOLE_WHITELIST_EMAILS=
+    - _APP_CONSOLE_WHITELIST_IPS=
+    - _APP_SYSTEM_RESPONSE_FORMAT=
+    - _APP_OPTIONS_ABUSE=disabled
+    - _APP_OPTIONS_FORCE_HTTPS=disabled
+    - _APP_REDIS_HOST=redis
+    - _APP_REDIS_PORT=6379
+    - _APP_DB_HOST=mariadb
+    - _APP_DB_PORT=3306
+    - _APP_DB_USER=appwrite
+    - _APP_DB_PASS=${APPWRITE_DB_PASS:?set APPWRITE_DB_PASS in .env}
+    - _APP_DB_SCHEMA=appwrite
+    - _APP_SMTP_HOST=mailpit
+    - _APP_SMTP_PORT=1025
+    - _APP_SMTP_SECURE=
+    - _APP_SMTP_USERNAME=
+    - _APP_SMTP_PASSWORD=
+  depends_on:
+    - mariadb
+    - redis
+
+x-appwrite-worker: &appwrite-worker
+  <<: *appwrite-defaults
+  command:
+    - php
+    - app/worker.php
+
 services:
   app:
-    image: appwrite/appwrite:1.5.0
+    <<: *appwrite-defaults
     container_name: 69-s1-appwrite
+    ports:
+      - "${APP_PORT:-9092}:80"
+      - "443:443"
+
+  appwrite-worker-databases:
+    <<: *appwrite-worker
+    container_name: 69-s1-appwrite-worker-databases
+    command:
+      - php
+      - app/worker.php
+      - databases
+
+  appwrite-worker-usage:
+    <<: *appwrite-worker
+    container_name: 69-s1-appwrite-worker-usage
+    command:
+      - php
+      - app/worker.php
+      - usage
+
+  appwrite-worker-audits:
+    <<: *appwrite-worker
+    container_name: 69-s1-appwrite-worker-audits
+    command:
+      - php
+      - app/worker.php
+      - audits
+
+  appwrite-worker-webhooks:
+    <<: *appwrite-worker
+    container_name: 69-s1-appwrite-worker-webhooks
+    command:
+      - php
+      - app/worker.php
+      - webhooks
+
+  appwrite-worker-certificates:
+    <<: *appwrite-worker
+    container_name: 69-s1-appwrite-worker-certificates
+    command:
+      - php
+      - app/worker.php
+      - certificates
+
+  appwrite-worker-functions:
+    <<: *appwrite-worker
+    container_name: 69-s1-appwrite-worker-functions
+    command:
+      - php
+      - app/worker.php
+      - functions
+
+  appwrite-worker-deletes:
+    <<: *appwrite-worker
+    container_name: 69-s1-appwrite-worker-deletes
+    command:
+      - php
+      - app/worker.php
+      - deletes
+
+  appwrite-worker-mails:
+    <<: *appwrite-worker
+    container_name: 69-s1-appwrite-worker-mails
+    command:
+      - php
+      - app/worker.php
+      - mails
+
+  appwrite-worker-messaging:
+    <<: *appwrite-worker
+    container_name: 69-s1-appwrite-worker-messaging
+    command:
+      - php
+      - app/worker.php
+      - messaging
+
+  appwrite-worker-migrations:
+    <<: *appwrite-worker
+    container_name: 69-s1-appwrite-worker-migrations
+    command:
+      - php
+      - app/worker.php
+      - migrations
+
+  mariadb:
+    image: mariadb:10.11
+    container_name: 69-s1-mariadb
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=${APPWRITE_DB_ROOT_PASSWORD:?set APPWRITE_DB_ROOT_PASSWORD in .env}
+      - MYSQL_DATABASE=appwrite
+      - MYSQL_USER=appwrite
+      - MYSQL_PASSWORD=${APPWRITE_DB_PASS:?set APPWRITE_DB_PASS in .env}
+    volumes:
+      - appwrite-mariadb:/var/lib/mysql
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: 69-s1-redis
+    restart: always
+    volumes:
+      - appwrite-redis:/data
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: 69-s1-mailpit
     restart: always
     ports:
-      - "9092:80"      # Change from 9091 -> 9092
-      - "443:443"
-    volumes:
-      - appwrite-uploads:/storage/uploads
-      - appwrite-builds:/storage/builds
-      - appwrite-cache:/storage/cache
-      - appwrite-config:/storage/config
-      - appwrite-certificates:/storage/certificates
-    environment:
-      - _APP_ENV=development
-      - _APP_SYSTEM_SECRET=your-super-secret-key-change-this
-      - _APP_DOMAIN=localhost
-      - _APP_DOMAIN_TARGET=localhost
-      - _APP_HOME=http://localhost:9092    # Change from 9091 -> 9092
+      - "8025:8025"
 
 volumes:
   appwrite-uploads:
@@ -26,3 +161,5 @@ volumes:
   appwrite-cache:
   appwrite-config:
   appwrite-certificates:
+  appwrite-redis:
+  appwrite-mariadb:
