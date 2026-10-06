@@ -1,69 +1,69 @@
-﻿# Cyber Security
+# Cyber Security
 
 ## My Information
 
 - Puttakorn Somkana
 - Tanatip Aiamongart
 - Thanachot Najainuek
+  
+## โครงสร้างโปรเจกต์
 
-## เนเธเธฃเธเธชเธฃเนเธฒเธเนเธเธฃเน€เธเธเธ•เน
+ระบบ **ห้องสมุด (Library)** บน Appwrite 1.5 แบบ self-hosted ด้วย Docker Compose
+ทดสอบ REST API (Auth + Database CRUD + Queries) ผ่านไฟล์ `api.http`
 
-เธฃเธฐเธเธ **เธซเนเธญเธเธชเธกเธธเธ” (Library)** เธเธ Appwrite 1.5 เนเธเธ self-hosted เธ”เนเธงเธข Docker Compose
-เธ—เธ”เธชเธญเธ REST API (Auth + Database CRUD + Queries) เธเนเธฒเธเนเธเธฅเน `api.http`
-
-| Service | Container | เธเธณเธญเธเธดเธเธฒเธข |
+| Service | Container | คำอธิบาย |
 | --- | --- | --- |
 | `app` | `69-s1-appwrite` | API + Console (`http://localhost:9092`) |
-| `appwrite-worker-*` | `69-s1-appwrite-worker-*` | Worker 10 เธ•เธฑเธง (databases, usage, audits, webhooks, certificates, functions, deletes, mails, messaging, migrations) |
-| `mariadb` | `69-s1-mariadb` | เธเธฒเธเธเนเธญเธกเธนเธฅเธซเธฅเธฑเธ |
+| `appwrite-worker-*` | `69-s1-appwrite-worker-*` | Worker 10 ตัว (databases, usage, audits, webhooks, certificates, functions, deletes, mails, messaging, migrations) |
+| `mariadb` | `69-s1-mariadb` | ฐานข้อมูลหลัก |
 | `redis` | `69-s1-redis` | Cache + Queue |
-| `mailpit` | `69-s1-mailpit` | SMTP เธเธณเธฅเธญเธเธชเธณเธซเธฃเธฑเธ dev (UI `http://localhost:8025`) |
+| `mailpit` | `69-s1-mailpit` | SMTP จำลองสำหรับ dev (UI `http://localhost:8025`) |
 
-**เธเธฒเธฃเนเธเนเธ config**
+**การแบ่ง config**
 
-- เธเนเธฒ infrastructure (secret, DB, Redis, SMTP) เธญเธขเธนเนเนเธ `docker-compose.yaml`
-- `.env` เน€เธเนเธเน€เธเธเธฒเธฐเธเนเธฒเธ—เธตเนเนเธเนเธ—เธ”เธชเธญเธ API (project id, endpoint, เธเนเธญเธกเธนเธฅเธ•เธฑเธงเธญเธขเนเธฒเธ) เธชเธณเธซเธฃเธฑเธ `api.http`
-- **worker เธเธณเน€เธเนเธเธกเธฒเธ** โ€” เธเธฒเธฃเธชเธฃเนเธฒเธ attribute เธเธญเธ Appwrite เน€เธเนเธเนเธเธ asynchronous เธ–เนเธฒเนเธกเนเธกเธต worker `databases` attribute เธเธฐเธเนเธฒเธเธชเธ–เธฒเธเธฐ `processing` เนเธฅเธฐ insert เธเนเธญเธกเธนเธฅเนเธกเนเนเธ”เน
+- ค่า infrastructure (secret, DB, Redis, SMTP) อยู่ใน `docker-compose.yaml`
+- `.env` เก็บเฉพาะค่าที่ใช้ทดสอบ API (project id, endpoint, ข้อมูลตัวอย่าง) สำหรับ `api.http`
+- **worker จำเป็นมาก** — การสร้าง attribute ของ Appwrite เป็นแบบ asynchronous ถ้าไม่มี worker `databases` attribute จะค้างสถานะ `processing` และ insert ข้อมูลไม่ได้
 
-## เธชเธดเนเธเธ—เธตเนเธ•เนเธญเธเธกเธต
+## สิ่งที่ต้องมี
 
-- Docker Desktop (เธซเธฃเธทเธญ Docker Engine + Compose v2)
-- VS Code + เธชเนเธงเธเธเธขเธฒเธข [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)
+- Docker Desktop (หรือ Docker Engine + Compose v2)
+- VS Code + ส่วนขยาย [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client)
 
-## เน€เธฃเธดเนเธกเนเธเนเธเธฒเธ
+## เริ่มใช้งาน
 
 ```powershell
-# 1. เธชเธฃเนเธฒเธเนเธเธฅเน .env เธเธฒเธ template
+# 1. สร้างไฟล์ .env จาก template
 Copy-Item .env.simple .env
 
-# 2. เน€เธเธดเธ” Appwrite
+# 2. เปิด Appwrite
 docker compose up -d
 ```
 
-3. เน€เธเธดเธ” `http://localhost:9092` โ’ เธชเธฃเนเธฒเธเธเธฑเธเธเธต Console เนเธฅเธฐ Project
-4. เธเธฑเธ”เธฅเธญเธ **Project ID** เนเธฅเธฐเธชเธฃเนเธฒเธ **API key** (เนเธซเนเธชเธดเธ—เธเธดเน `databases`, `collections`, `attributes`, `documents`, `users`) เธกเธฒเนเธชเนเนเธ `.env`
-5. เนเธชเนเธเนเธฒ `USER_LOGIN_*` / `USER_REGISTER_*` เนเธ `.env`
-6. เน€เธเธดเธ” `api.http` โ’ เธฃเธฑเธ `1.1 Login`
-7. เธเธฒเธ response เธเธญเธ `1.1 Login` เธเธฑเธ”เธฅเธญเธเธเนเธฒ token เนเธ header `Set-Cookie` (เธเนเธฒเธซเธฅเธฑเธ `a_session_<PROJECT_ID>=` เธเธเธ–เธถเธ `;`) เนเธเนเธชเนเนเธ `.env` เธ—เธตเน `APPWRITE_SESSION_TOKEN`
-8. เธ—เธ”เธชเธญเธ section 2โ€“6 เนเธ”เนเน€เธฅเธข
+3. เปิด `http://localhost:9092` → สร้างบัญชี Console และ Project
+4. คัดลอก **Project ID** และสร้าง **API key** (ให้สิทธิ์ `databases`, `collections`, `attributes`, `documents`, `users`) มาใส่ใน `.env`
+5. ใส่ค่า `USER_LOGIN_*` / `USER_REGISTER_*` ใน `.env`
+6. เปิด `api.http` → รัน `1.1 Login`
+7. จาก response ของ `1.1 Login` คัดลอกค่า token ใน header `Set-Cookie` (ค่าหลัง `a_session_<PROJECT_ID>=` จนถึง `;`) ไปใส่ใน `.env` ที่ `APPWRITE_SESSION_TOKEN`
+8. ทดสอบ section 2–6 ได้เลย
 
-> `{{$dotenv ...}}` เนเธ `api.http` เธญเนเธฒเธเธเนเธฒเธเธฒเธ `.env` เธ—เธตเนเธญเธขเธนเนเนเธเธฅเน€เธ”เธญเธฃเนเน€เธ”เธตเธขเธงเธเธฑเธเนเธเธฅเน `.http` เนเธ”เธขเธญเธฑเธ•เนเธเธกเธฑเธ•เธด
+> `{{$dotenv ...}}` ใน `api.http` อ่านค่าจาก `.env` ที่อยู่โฟลเดอร์เดียวกับไฟล์ `.http` โดยอัตโนมัติ
 
-> **เธ—เธณเนเธกเธ•เนเธญเธ copy token เน€เธญเธ?** Appwrite 1.5 เน€เธเธฅเธตเนเธขเธเธฃเธนเธเนเธเธ session เน€เธเนเธ token เธ—เธตเนเธกเธต `secret` เธเธเธงเธเธญเธขเธนเนเนเธ base64 เนเธฅเธฐ**เนเธกเนเธชเนเธ response header `x-appwrite-session` เธเธฅเธฑเธเธกเธฒ** เนเธ•เนเธชเนเธเธเนเธฒเธ `Set-Cookie` เนเธ—เธ REST Client เธเธญเธ VS Code เธเธฑเธ”เธเธฒเธฃ cookie เนเธซเนเน€เธญเธเนเธกเนเนเธ”เน เธเธถเธเธ•เนเธญเธ copy เธเนเธฒเธเธฑเนเธเธกเธฒเธชเนเธเน€เธเนเธ `X-Appwrite-Session` เน€เธญเธ
+> **ทำไมต้อง copy token เอง?** Appwrite 1.5 เปลี่ยนรูปแบบ session เป็น token ที่มี `secret` ผนวกอยู่ใน base64 และ**ไม่ส่ง response header `x-appwrite-session` กลับมา** แต่ส่งผ่าน `Set-Cookie` แทน REST Client ของ VS Code จัดการ cookie ให้เองไม่ได้ จึงต้อง copy ค่านั้นมาส่งเป็น `X-Appwrite-Session` เอง
 
-## เนเธเธฃเธเธชเธฃเนเธฒเธเธเนเธญเธกเธนเธฅ (เธฃเธฐเธเธเธซเนเธญเธเธชเธกเธธเธ”)
+## โครงสร้างข้อมูล (ระบบห้องสมุด)
 
-Database `main` เธกเธต 5 collection โ€” collection เน€เธ”เธดเธก (`students`, `subjects`, `teachers`) เธ–เธนเธเธฅเธเนเธฅเนเธง
-เธ—เธธเธ collection เนเธเน `documentSecurity = true` เนเธฅเธฐเธชเธดเธ—เธเธดเนเธฃเธฐเธ”เธฑเธ collection เน€เธเนเธ
-`create("users"), read("users"), update("users"), delete("users")` โ’ เธ•เนเธญเธ Login เธเนเธญเธเธเธถเธเธเธฐเธญเนเธฒเธ/เน€เธเธตเธขเธเนเธ”เน
+Database `main` มี 5 collection — collection เดิม (`students`, `subjects`, `teachers`) ถูกลบแล้ว
+ทุก collection ใช้ `documentSecurity = true` และสิทธิ์ระดับ collection เป็น
+`create("users"), read("users"), update("users"), delete("users")` → ต้อง Login ก่อนจึงจะอ่าน/เขียนได้
 
-| Collection | Attribute | Type | Req | Default | เธซเธกเธฒเธขเน€เธซเธ•เธธ |
+| Collection | Attribute | Type | Req | Default | หมายเหตุ |
 | --- | --- | --- | --- | --- | --- |
 | `categories` | `name` | string(255) | yes | | |
 | | `slug` | string(255) | yes | | unique |
 | | `description` | string(1000) | no | | |
-| `profiles` | `user_id` | string(255) | yes | | unique, เธเธนเธเธเธฑเธ Appwrite user |
-| | `member_id` | string(50) | yes | | unique, เธฃเธซเธฑเธชเธชเธกเธฒเธเธดเธ |
+| `profiles` | `user_id` | string(255) | yes | | unique, ผูกกับ Appwrite user |
+| | `member_id` | string(50) | yes | | unique, รหัสสมาชิก |
 | | `name` | string(255) | yes | | |
 | | `email` | email | yes | | |
 | | `phone` | string(20) | no | | |
@@ -73,25 +73,25 @@ Database `main` เธกเธต 5 collection โ€” collection เน€�
 | | `author` | string(255) | yes | | |
 | | `isbn` | string(50) | no | | unique |
 | | `publisher` | string(255) | no | | |
-| | `publish_year` | integer | no | | 0โ€“3000 |
-| | `category_id` | string(255) | yes | | เธญเนเธฒเธเธญเธดเธ `categories` |
-| | `total_copies` | integer | no | `1` | 0โ€“100000 |
-| | `available_copies` | integer | no | `1` | 0โ€“100000 |
+| | `publish_year` | integer | no | | 0–3000 |
+| | `category_id` | string(255) | yes | | อ้างอิง `categories` |
+| | `total_copies` | integer | no | `1` | 0–100000 |
+| | `available_copies` | integer | no | `1` | 0–100000 |
 | | `cover_url` | url | no | | |
 | | `description` | string(2000) | no | | |
-| `borrowings` | `user_id` | string(255) | yes | | เธญเนเธฒเธเธญเธดเธ `profiles.user_id` |
-| | `book_id` | string(255) | yes | | เธญเนเธฒเธเธญเธดเธ `books` |
+| `borrowings` | `user_id` | string(255) | yes | | อ้างอิง `profiles.user_id` |
+| | `book_id` | string(255) | yes | | อ้างอิง `books` |
 | | `borrow_date` | datetime | yes | | |
 | | `due_date` | datetime | yes | | |
-| | `return_date` | datetime | no | | เธงเนเธฒเธ = เธขเธฑเธเนเธกเนเธเธทเธ |
+| | `return_date` | datetime | no | | ว่าง = ยังไม่คืน |
 | | `status` | enum | no | `borrowed` | `borrowed` / `returned` / `overdue` / `lost` |
-| | `fine` | float | no | | เธเนเธฒเธเธฃเธฑเธ |
-| `reservations` | `user_id` | string(255) | yes | | เธญเนเธฒเธเธญเธดเธ `profiles.user_id` |
-| | `book_id` | string(255) | yes | | เธญเนเธฒเธเธญเธดเธ `books` |
+| | `fine` | float | no | | ค่าปรับ |
+| `reservations` | `user_id` | string(255) | yes | | อ้างอิง `profiles.user_id` |
+| | `book_id` | string(255) | yes | | อ้างอิง `books` |
 | | `reserved_at` | datetime | yes | | |
-| | `fulfilled_at` | datetime | no | | เธงเนเธฒเธ = เธขเธฑเธเธฃเธญเธญเธขเธนเน |
+| | `fulfilled_at` | datetime | no | | ว่าง = ยังรออยู่ |
 | | `status` | enum | no | `waiting` | `waiting` / `fulfilled` / `cancelled` / `expired` |
-| | `queue_position` | integer | no | | เธฅเธณเธ”เธฑเธเธเธดเธง 0โ€“100000 |
+| | `queue_position` | integer | no | | ลำดับคิว 0–100000 |
 | | `note` | string(500) | no | | |
 
 ### Index
@@ -114,58 +114,57 @@ Database `main` เธกเธต 5 collection โ€” collection เน€�
 | | `idx_book_id` | key | `book_id` |
 | | `idx_status` | key | `status` |
 
-### เธฃเธนเธเนเธเธ `queries` เธเธญเธ Appwrite 1.5
+### รูปแบบ `queries` ของ Appwrite 1.5
 
-`queries` เน€เธเนเธ **array param** เธ•เนเธญเธเธชเนเธเธเนเธณเน€เธเนเธ `queries[0]`, `queries[1]`, ... (เนเธกเนเนเธเน JSON array เน€เธ”เธตเธขเธง)
+`queries` เป็น **array param** ต้องส่งซ้ำเป็น `queries[0]`, `queries[1]`, ... (ไม่ใช่ JSON array เดียว)
 
 ```text
 ?queries[0]={"method":"equal","attribute":"status","values":["waiting"]}&queries[1]={"method":"limit","values":[25]}
 ```
 
-เธเนเธฒ JSON เธ•เนเธญเธ URL-encode เธ–เนเธฒเน€เธฃเธตเธขเธเธ”เนเธงเธข client เธ—เธตเน encode เนเธซเนเธญเธฑเธ•เนเธเธกเธฑเธ•เธด (เน€เธเนเธ Postman/SDK) เนเธกเนเธ•เนเธญเธเธ—เธณเน€เธญเธ
+ค่า JSON ต้อง URL-encode ถ้าเรียกด้วย client ที่ encode ให้อัตโนมัติ (เช่น Postman/SDK) ไม่ต้องทำเอง
 
-## เธเธณเธชเธฑเนเธเธ—เธตเนเนเธเนเธเนเธญเธข
+## คำสั่งที่ใช้บ่อย
 
 ```powershell
-docker compose up -d            # เธชเธ•เธฒเธฃเนเธ— / เธญเธฑเธเน€เธ”เธ•
-docker compose ps               # เธ”เธนเธชเธ–เธฒเธเธฐ
-docker compose logs -f app      # เธ”เธน log
-docker compose down             # เธซเธขเธธเธ” (เธเนเธญเธกเธนเธฅเธขเธฑเธเธญเธขเธนเน)
-docker compose down -v          # เธซเธขเธธเธ” + เธฅเธเธเนเธญเธกเธนเธฅเธ—เธฑเนเธเธซเธกเธ”
+docker compose up -d            # สตาร์ท / อัปเดต
+docker compose ps               # ดูสถานะ
+docker compose logs -f app      # ดู log
+docker compose down             # หยุด (ข้อมูลยังอยู่)
+docker compose down -v          # หยุด + ลบข้อมูลทั้งหมด
 ```
 
-เธ•เธฃเธงเธเธชเธธเธเธ เธฒเธเธฃเธฐเธเธเธ•เธฒเธกเธกเธฒเธ•เธฃเธเธฒเธ Appwrite:
+ตรวจสุขภาพระบบตามมาตรฐาน Appwrite:
 
 ```powershell
 docker exec 69-s1-appwrite php app/cli.php doctor
 ```
 
-## เนเธเนเธเธฑเธเธซเธฒ (Troubleshooting)
+## แก้ปัญหา (Troubleshooting)
 
-| เธญเธฒเธเธฒเธฃ | เธชเธฒเน€เธซเธ•เธธ | เธงเธดเธเธตเนเธเน |
+| อาการ | สาเหตุ | วิธีแก้ |
 | --- | --- | --- |
-| `Unknown attribute` เธ•เธญเธ insert | attribute เธเนเธฒเธเธชเธ–เธฒเธเธฐ `processing` เน€เธเธฃเธฒเธฐเนเธกเนเธกเธต worker `databases` | `docker compose up -d` เนเธซเน worker เธเธฃเธ |
-| เธ—เธธเธ request เนเธ”เน `500` / `getHeader(): Argument #2 must be of type string` | เนเธกเนเนเธ”เนเธ•เธฑเนเธ `_APP_SYSTEM_RESPONSE_FORMAT` | เธ•เนเธญเธเธกเธตเธ•เธฑเธงเนเธเธฃเธเธตเนเนเธ `docker-compose.yaml` (เธ•เธฑเนเธเน€เธเนเธเธเนเธฒเธงเนเธฒเธเนเธ”เน) |
-| `401 User (role: guests) missing scope (...)` | เธขเธฑเธเนเธกเนเนเธ”เน Login เธซเธฃเธทเธญเธขเธฑเธเนเธกเนเนเธชเน `APPWRITE_SESSION_TOKEN` | เธฃเธฑเธ `1.1 Login` เนเธฅเนเธง copy token เธเธฒเธ `Set-Cookie` เนเธเนเธชเนเนเธ `.env` |
-| `401` เธ•เธญเธ create/update/delete | collection เนเธเน `read("users")` / `create("users")` | guest เธ—เธณเนเธกเนเนเธ”เน เธ•เนเธญเธ login (list เธเธฐเนเธ”เน 200 เนเธ•เนเธงเนเธฒเธเน€เธเธฅเนเธฒ เนเธกเนเนเธเน 401) |
-| list เนเธ”เน 200 เนเธ•เน `total = 0` เธ—เธฑเนเธเธ—เธตเนเธกเธตเธเนเธญเธกเธนเธฅ | เธขเธฑเธเนเธกเน Login เธซเธฃเธทเธญเธชเนเธ token เธเธดเธ” | เธ•เธฃเธงเธ `APPWRITE_SESSION_TOKEN` |
-| `Cannot set default value for required attribute` | Appwrite 1.5 เธซเนเธฒเธกเธ•เธฑเนเธ default เนเธซเน attribute เธ—เธตเน `required` | เธ•เธฑเนเธ `required = false` เธเธนเนเธเธฑเธ `default` |
-| `400 Invalid 'orders' param: must be one of (asc, desc)` | เธเนเธฒ order เธ•เนเธญเธเธเธดเธกเธเนเน€เธฅเนเธ | เนเธเน `asc` / `desc`; unique เนเธซเนเนเธเน `type: "unique"` เนเธ—เธ |
-| `400 Invalid 'queries' param` | เธชเนเธ `queries` เน€เธเนเธ JSON array เน€เธ”เธตเธขเธง | เธ•เนเธญเธเธชเนเธเธเนเธณเน€เธเนเธ `queries[0]=...&queries[1]=...` |
-| `400 Invalid query: Query value is invalid for attribute "..."` | เธเนเธฒเนเธ query เธกเธต `+` (เน€เธเนเธ `+00:00`) โ€” `+` เนเธ URL เธ–เธนเธเธญเนเธฒเธเน€เธเนเธเธเนเธญเธเธงเนเธฒเธ | เน€เธเธตเธขเธ datetime เนเธเธฃเธนเธเนเธเธ `Z` เน€เธเนเธ `2026-10-05T07:00:00.000Z` เธซเธฃเธทเธญ encode เน€เธเนเธ `%2B` |
-| `401 User maximum sessions reached` | login เธชเธฐเธชเธกเน€เธเธดเธ 10 session (เธเนเธฒ default เธเธญเธเนเธเธฃเน€เธเธเธ•เน) | เธฅเธ session เน€เธเนเธฒเธเนเธฒเธ Console โ’ Users โ’ Sessions |
-| register เนเธ”เน `409` | email เธ—เธตเนเธชเธกเธฑเธเธฃเธกเธตเธญเธขเธนเนเนเธฅเนเธง | เน€เธเธฅเธตเนเธขเธ `USER_REGISTER_EMAIL` |
-| update เนเธ”เน `400 Unknown attribute: ...` | เธเธทเนเธญ field เนเธกเนเธ•เธฃเธเธเธฑเธ attribute เธเธญเธ collection | เธ•เธฃเธงเธเธเธทเนเธญ attribute เนเธ Console เนเธซเนเธ•เธฃเธเธเธฑเธ |
-| Login เนเธกเนเนเธ”เนเธซเธฅเธฑเธเนเธเน secret | เน€เธเธฅเธตเนเธขเธ `_APP_OPENSSL_KEY_V1` (เนเธเนเธ–เธญเธ”เธฃเธซเธฑเธช password) | เธเธทเธเธเนเธฒเน€เธ”เธดเธก เธซเนเธฒเธกเน€เธเธฅเธตเนเธขเธเธซเธฅเธฑเธเน€เธฃเธดเนเธกเนเธเนเธเธฒเธ |
+| `Unknown attribute` ตอน insert | attribute ค้างสถานะ `processing` เพราะไม่มี worker `databases` | `docker compose up -d` ให้ worker ครบ |
+| ทุก request ได้ `500` / `getHeader(): Argument #2 must be of type string` | ไม่ได้ตั้ง `_APP_SYSTEM_RESPONSE_FORMAT` | ต้องมีตัวแปรนี้ใน `docker-compose.yaml` (ตั้งเป็นค่าว่างได้) |
+| `401 User (role: guests) missing scope (...)` | ยังไม่ได้ Login หรือยังไม่ใส่ `APPWRITE_SESSION_TOKEN` | รัน `1.1 Login` แล้ว copy token จาก `Set-Cookie` ไปใส่ใน `.env` |
+| `401` ตอน create/update/delete | collection ใช้ `read("users")` / `create("users")` | guest ทำไม่ได้ ต้อง login (list จะได้ 200 แต่ว่างเปล่า ไม่ใช่ 401) |
+| list ได้ 200 แต่ `total = 0` ทั้งที่มีข้อมูล | ยังไม่ Login หรือส่ง token ผิด | ตรวจ `APPWRITE_SESSION_TOKEN` |
+| `Cannot set default value for required attribute` | Appwrite 1.5 ห้ามตั้ง default ให้ attribute ที่ `required` | ตั้ง `required = false` คู่กับ `default` |
+| `400 Invalid 'orders' param: must be one of (asc, desc)` | ค่า order ต้องพิมพ์เล็ก | ใช้ `asc` / `desc`; unique ให้ใช้ `type: "unique"` แทน |
+| `400 Invalid 'queries' param` | ส่ง `queries` เป็น JSON array เดียว | ต้องส่งซ้ำเป็น `queries[0]=...&queries[1]=...` |
+| `400 Invalid query: Query value is invalid for attribute "..."` | ค่าใน query มี `+` (เช่น `+00:00`) — `+` ใน URL ถูกอ่านเป็นช่องว่าง | เขียน datetime ในรูปแบบ `Z` เช่น `2026-10-05T07:00:00.000Z` หรือ encode เป็น `%2B` |
+| `401 User maximum sessions reached` | login สะสมเกิน 10 session (ค่า default ของโปรเจกต์) | ลบ session เก่าผ่าน Console → Users → Sessions |
+| register ได้ `409` | email ที่สมัครมีอยู่แล้ว | เปลี่ยน `USER_REGISTER_EMAIL` |
+| update ได้ `400 Unknown attribute: ...` | ชื่อ field ไม่ตรงกับ attribute ของ collection | ตรวจชื่อ attribute ใน Console ให้ตรงกัน |
+| Login ไม่ได้หลังแก้ secret | เปลี่ยน `_APP_OPENSSL_KEY_V1` (ใช้ถอดรหัส password) | คืนค่าเดิม ห้ามเปลี่ยนหลังเริ่มใช้งาน |
 
-> เธซเธกเธฒเธขเน€เธซเธ•เธธ: เนเธ Appwrite 1.5.0 เธเธฒเธฃเน€เธเธฅเธตเนเธขเธ collection permission เนเธซเนเนเธเน `PUT /v1/databases/{db}/collections/{collectionId}`
-> เธเธฃเนเธญเธกเธชเนเธ `name` เนเธเธ”เนเธงเธขเน€เธชเธกเธญ เนเธฅเธฐเธ–เนเธฒเนเธกเนเธชเนเธ `documentSecurity` เธเนเธฒเธเธฐเธ–เธนเธเธฃเธตเน€เธเนเธ•เน€เธเนเธ `false`
+> หมายเหตุ: ใน Appwrite 1.5.0 การเปลี่ยน collection permission ให้ใช้ `PUT /v1/databases/{db}/collections/{collectionId}`
+> พร้อมส่ง `name` ไปด้วยเสมอ และถ้าไม่ส่ง `documentSecurity` ค่าจะถูกรีเซ็ตเป็น `false`
 
-## เธซเธกเธฒเธขเน€เธซเธ•เธธเธ”เนเธฒเธเธเธงเธฒเธกเธเธฅเธญเธ”เธ เธฑเธข
+## หมายเหตุด้านความปลอดภัย
 
-- `.env` เนเธฅเธฐ `api.http` เธ–เธนเธ ignore เนเธกเน commit โ€” เนเธ•เน `docker-compose.yaml` **เธกเธต secret เธเธฃเธดเธเธญเธขเธนเน** เธ–เนเธฒเธเธฐเน€เธเธขเนเธเธฃเน repo เธ•เนเธญเธเธ—เธณเนเธซเนเน€เธเนเธ private เธซเธฃเธทเธญเธขเนเธฒเธข secret เธญเธญเธ
-- `.env` เธกเธต `APPWRITE_SESSION_TOKEN` เธเธถเนเธเน€เธเนเธ session เธ—เธตเนเนเธเนเธเธฒเธเนเธ”เนเธเธฃเธดเธ โ€” เธญเธขเนเธฒ commit เธซเธฃเธทเธญเนเธเธฃเนเนเธเธฅเนเธเธตเน
-- เธชเธดเธ—เธเธดเนเธฃเธฐเธ”เธฑเธ collection เน€เธเนเธ `("users")` เธ—เธฑเนเธเธซเธกเธ” = เธ—เธธเธเธเธเธ—เธตเน login เนเธฅเนเธงเธญเนเธฒเธ/เน€เธเธตเธขเธเนเธ”เนเธ—เธธเธ document (เธขเธฑเธเนเธกเนเธกเธตเธเธฒเธฃเนเธขเธเธชเธดเธ—เธเธดเนเธ•เธฒเธก `role`)
-- เธเนเธฒ `_APP_OPTIONS_ABUSE=disabled` เนเธฅเธฐ `_APP_OPTIONS_FORCE_HTTPS=disabled` เน€เธซเธกเธฒเธฐเธเธฑเธ dev เน€เธ—เนเธฒเธเธฑเนเธ
-- mariadb / redis เนเธกเนเน€เธเธดเธ” port เธญเธญเธเธ เธฒเธขเธเธญเธ เน€เธเนเธฒเธ–เธถเธเนเธ”เนเน€เธเธเธฒเธฐเนเธ Docker network
-
+- `.env` และ `api.http` ถูก ignore ไม่ commit — แต่ `docker-compose.yaml` **มี secret จริงอยู่** ถ้าจะเผยแพร่ repo ต้องทำให้เป็น private หรือย้าย secret ออก
+- `.env` มี `APPWRITE_SESSION_TOKEN` ซึ่งเป็น session ที่ใช้งานได้จริง — อย่า commit หรือแชร์ไฟล์นี้
+- สิทธิ์ระดับ collection เป็น `("users")` ทั้งหมด = ทุกคนที่ login แล้วอ่าน/เขียนได้ทุก document (ยังไม่มีการแยกสิทธิ์ตาม `role`)
+- ค่า `_APP_OPTIONS_ABUSE=disabled` และ `_APP_OPTIONS_FORCE_HTTPS=disabled` เหมาะกับ dev เท่านั้น
+- mariadb / redis ไม่เปิด port ออกภายนอก เข้าถึงได้เฉพาะใน Docker network
